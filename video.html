@@ -1,0 +1,63 @@
+
+<html>
+<head>
+	<script type="text/javascript" src="https://player.vimeo.com/api/player.js?ver=4.7.2"></script>
+	<script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+	<style>
+    	.mainContainer{ margin: auto; width:60vw; margin-top:10vh; 
+    		border:1px solid black;
+    		background: white;
+    		padding:10px;
+    		text-align: center;
+    	}
+    	#vimeo_video{width:100%; height:60%;}
+    </style>
+</head>
+<body>
+	<div class="mainContainer" >
+		<h1>Smooth Volume Hover</h1>
+		<div>Using Vimeo's player.js to set the volume on hover.<br/>
+			The volumeChange function could be altered for making any smooth transition with any library.<br/><br/>
+		<iframe id="vimeo_video" src="https://player.vimeo.com/video/156615388?autoplay=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0&amp;data-ready=true"  frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+		<p><a href="https://vimeo.com/156615388">Day In The Life Of Someone In Love</a> from <a href="https://vimeo.com/manooh">Manuela Hutter</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+	</div>
+<script>
+
+var iframe = document.querySelector('#vimeo_video');
+var player = new Vimeo.Player(iframe);
+
+player.on('play', function() {
+    player.setVolume(0);
+});
+
+
+jQuery('#vimeo_video').hover(function () {
+	volumeChange(player, 0.05);  //puts volume up
+}, function () {
+	volumeChange(player, -0.05);  //puts volume down
+});
+
+
+		        
+
+function volumeChange(player, volumeChangeSpeed,looping) {   // looping should be null/false when called by user
+	if(!looping){
+		volumeChangeDirectionUp = volumeChangeSpeed>0;   // when function is first called, set global flag
+	}
+
+	player.getVolume().then(function(volume) {
+		if ((volumeChangeDirectionUp  && volumeChangeSpeed>0 && volume<1) || 
+			(!volumeChangeDirectionUp && volumeChangeSpeed<0 && volume>0) ){
+			newVolume = volume>0.1 ?volume+volumeChangeSpeed: volume+volumeChangeSpeed/5;
+			if(newVolume<0)newVolume=0;if(newVolume>1)newVolume=1;
+		    player.setVolume(newVolume).then(function(newVolume) {
+		        setTimeout(function () {volumeChange(player, volumeChangeSpeed, true);}, 100);
+			})	
+		}
+	});
+}
+
+</script>
+</body>
+</html>
